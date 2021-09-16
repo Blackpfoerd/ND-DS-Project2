@@ -27,13 +27,22 @@ def clean_data(df):
     Output:
         pandas.DateFrame Object    
     """
-    #categories = categories.categories.str.split(pat=';',expand=True)
+    categories = df.categories.str.split(pat=';',expand=True)
+    categories.columns = categories.iloc[1].str.split(pat='-').apply(lambda x: x[0])
+    
+    for column in categories:
+    # set each value to be the last character of the string
+        categories[column] = categories[column].str[-1:]
+        categories[column] = pd.to_numeric(categories[column],downcast='integer')
+    df=df.drop(columns='categories').join(categories)
+    df.drop_duplicates(inplace=True)
     return df
 
 
 def save_data(df, database_filename):
     """ 
-    Description: Loads messages and categories files (csv) and merges them into a single DataFrame
+    Description: Saves the transformed DataFrame to database_filename.db
+    table DisasterResponse
     
     Input:
         df: pandas.DataFrame = DataFrame 
@@ -56,7 +65,7 @@ def main():
 
         print('Cleaning data...')
         df = clean_data(df)
-        
+    
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
         save_data(df, database_filepath)
         
