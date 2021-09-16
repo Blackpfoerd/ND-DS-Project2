@@ -1,16 +1,44 @@
 import sys
+import pandas as pd
+from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
-    pass
+    """ 
+    Description: Loads messages and categories files (csv) and merges them into a single DataFrame
+    
+    Input:
+        messages_filepath:      string  --> path of messages (csv)
+        categories_filepath:    string  --> path of categories (csv)  
+    Output:
+        pandas.DateFrame Object    
+    """
+    
+    return df
 
 
 def clean_data(df):
-    pass
+    """ 
+    Description: Loads messages and categories files (csv) and merges them into a single DataFrame
+    
+    Input:
+        messages_filepath:      string  --> path of messages (csv)
+        categories_filepath:    string  --> path of categories (csv)  
+    Output:
+        pandas.DateFrame Object    
+    """
 
 
 def save_data(df, database_filename):
-    pass  
+    """ 
+    Description: Loads messages and categories files (csv) and merges them into a single DataFrame
+    
+    Input:
+        messages_filepath:      string  --> path of messages (csv)
+        categories_filepath:    string  --> path of categories (csv)  
+    Output:
+        pandas.DateFrame Object    
+    """
 
 
 def main():
