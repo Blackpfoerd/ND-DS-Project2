@@ -13,8 +13,9 @@ def load_data(messages_filepath, categories_filepath):
     Output:
         pandas.DateFrame Object    
     """
-    
-    return df
+    df_m = pd.read_csv(messages_filepath)
+    df_c = pd.read_csv(categories_filepath)
+    return pd.merge(df_m,df_c,how='inner',on='id')
 
 
 def clean_data(df):
@@ -22,11 +23,12 @@ def clean_data(df):
     Description: Loads messages and categories files (csv) and merges them into a single DataFrame
     
     Input:
-        messages_filepath:      string  --> path of messages (csv)
-        categories_filepath:    string  --> path of categories (csv)  
+        df: pandas.DataFrame = to clean DataFrame 
     Output:
         pandas.DateFrame Object    
     """
+    #categories = categories.categories.str.split(pat=';',expand=True)
+    return df
 
 
 def save_data(df, database_filename):
@@ -34,11 +36,13 @@ def save_data(df, database_filename):
     Description: Loads messages and categories files (csv) and merges them into a single DataFrame
     
     Input:
-        messages_filepath:      string  --> path of messages (csv)
-        categories_filepath:    string  --> path of categories (csv)  
+        df: pandas.DataFrame = DataFrame 
+        database_filename: string  --> path of saved database 
     Output:
-        pandas.DateFrame Object    
+        No output  
     """
+    engine = create_engine('sqlite:///'+database_filename)
+    df.to_sql('DisasterResponse',engine,if_exists = 'replace', index=False)
 
 
 def main():
