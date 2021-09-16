@@ -1,9 +1,26 @@
 import sys
+import pandas as pd
+from sqlalchemy import create_engine
+from sklearn.model_selection import train_test_split, GridSearchCV
 
 
 def load_data(database_filepath):
-    pass
-
+    """ 
+    Description: Loads data from database
+    
+    Input:
+        database_filepath: string = path of database  
+    Output:
+        X: pandas.DataFrame = Subset of df with predictor Columns
+        y: pandas.DataFrame = Subset of df with target columns
+        category_name: list = list of categories
+    """
+    engine = create_engine('sqlite:///'+database_filepath)
+    df= pd.read_sql_table('DisasterResponse', engine)
+    X= df.message
+    y= df[df.columns.difference(X.columns)]
+    category_names=y.columns
+    return X,y,category_names
 
 def tokenize(text):
     pass

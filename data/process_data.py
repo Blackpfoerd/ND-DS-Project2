@@ -8,8 +8,8 @@ def load_data(messages_filepath, categories_filepath):
     Description: Loads messages and categories files (csv) and merges them into a single DataFrame
     
     Input:
-        messages_filepath:      string  --> path of messages (csv)
-        categories_filepath:    string  --> path of categories (csv)  
+        messages_filepath: string = path of messages (csv)
+        categories_filepath: string = path of categories (csv)  
     Output:
         pandas.DateFrame Object    
     """
