@@ -1,11 +1,16 @@
 import sys
 import pandas as pd
+import re
+import pickle
+
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.multioutput import MultiOutputClassifier
 
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
 
 
 def load_data(database_filepath):
@@ -34,17 +39,17 @@ def tokenize(text):
         text: string =   
     Output:
         clean_tokens: list = returns list of cleaned tokens
-    """
-    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-    detected_urls = re.findall(url_regex, text)
-    for url in detected_urls:
-        text = text.replace(url, "urlplaceholder")
-    
+    """  
+    text = re.sub(r'[^a-z0-9]'," ", text.lower())
+    #tokenize and remove stop words
     tokens = word_tokenize(text)
+    tokens_wo_stop= [word for word in tokens if word not in stopwords.words('english')]
+    
+    
     lemmantizer = WordNetLemmatizer()
     
     clean_tokens =[]
-    for tok in tokens:
+    for tok in tokens_wo_stop:
         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
         clean_tokens.append(clean_tok)
     
@@ -63,8 +68,17 @@ def build_model():
     model=Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', RandomForestClassifier())
+        ('clf', MultiOutputClassifier(RandomForestClassifier(),n_jobs=1))
     ])
+    
+    parameters = {
+        'vect__ngram_range': ((1, 1), (1, 2)),
+        'tfidf__use_idf': [True, False],
+        'tfidf__norm': ['l1', 'l2']
+    }
+    
+    model = GridSearchCV(pipeline, param_grid=parameters,
+                         cv=2, verbose=1)
     
     
     return model
@@ -75,7 +89,17 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
-    pass
+    """ 
+    Description: Saves model to model filepath
+    
+    Input:
+        model: Object = Classifier
+        model_filepath: string = location to save the model
+    Output:
+        --
+    """
+    with open(model_filepath, 'wb') as outfile:
+        pickle.dump(model, outfile)
 
 
 def main():
