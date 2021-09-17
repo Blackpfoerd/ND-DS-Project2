@@ -2,6 +2,7 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
 
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -52,13 +53,18 @@ def tokenize(text):
 
 def build_model():
     """ 
-    Description: Create Model Object
+    Description: Returns Pipeline Object
     
     Input:
         --  
     Output:
-        model: pandas.DataFrame = Subset of df with predictor Columns
+        model: Pipeline = Returns ML Pipeline
     """
+    model=Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', RandomForestClassifier())
+    ])
     
     
     return model
