@@ -3,6 +3,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split, GridSearchCV
 
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
 
 def load_data(database_filepath):
     """ 
@@ -23,11 +26,42 @@ def load_data(database_filepath):
     return X,y,category_names
 
 def tokenize(text):
-    pass
+    """ 
+    Description: Tokenizer function for CountVectorizer
+    
+    Input:
+        text: string =   
+    Output:
+        clean_tokens: list = returns list of cleaned tokens
+    """
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    detected_urls = re.findall(url_regex, text)
+    for url in detected_urls:
+        text = text.replace(url, "urlplaceholder")
+    
+    tokens = word_tokenize(text)
+    lemmantizer = WordNetLemmatizer()
+    
+    clean_tokens =[]
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
+    
+    return clean_tokens
 
 
 def build_model():
-    pass
+    """ 
+    Description: Create Model Object
+    
+    Input:
+        --  
+    Output:
+        model: pandas.DataFrame = Subset of df with predictor Columns
+    """
+    
+    
+    return model
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
