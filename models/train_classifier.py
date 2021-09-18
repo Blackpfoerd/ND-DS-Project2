@@ -6,8 +6,12 @@ import pickle
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.metrics import confusion_matrix
+from sklearn.feature_extraction.text import CountVectorizer,TfidfTransformer
+
+import nltk
 
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -28,7 +32,8 @@ def load_data(database_filepath):
     engine = create_engine('sqlite:///'+database_filepath)
     df= pd.read_sql_table('DisasterResponse', engine)
     X= df.message
-    y= df[df.columns.difference(X.columns)]
+    y= df[df.columns.difference(['message'])]
+    
     category_names=y.columns
     return X,y,category_names
 
@@ -44,16 +49,17 @@ def tokenize(text):
     text = re.sub(r'[^a-z0-9]'," ", text.lower())
     #tokenize and remove stop words
     tokens = word_tokenize(text)
-    tokens_wo_stop= [word for word in tokens if word not in stopwords.words('english')]
+    #print('ok')
+    #tokens_wo_stop= [word for word in tokens if word not in stopwords.words('english')]
     
     
-    lemmantizer = WordNetLemmatizer()
+    lemmatizer = WordNetLemmatizer()
     
     clean_tokens =[]
-    for tok in tokens_wo_stop:
+    for tok in tokens:
         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
         clean_tokens.append(clean_tok)
-    
+   
     return clean_tokens
 
 
@@ -66,10 +72,10 @@ def build_model():
     Output:
         model: Pipeline = Returns ML Pipeline
     """
-    model=Pipeline([
+    pipeline=Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(RandomForestClassifier(),n_jobs=1))
+        ('clf', MultiOutputClassifier(RandomForestClassifier(random_state=42),n_jobs=1))
     ])
     
     parameters = {
@@ -77,9 +83,9 @@ def build_model():
         'tfidf__use_idf': [True, False],
         'tfidf__norm': ['l1', 'l2']
     }
-    
-    model = GridSearchCV(pipeline, param_grid=parameters,
-                         cv=2, verbose=1)
+    model=pipeline
+    #model = GridSearchCV(pipeline, param_grid=parameters,
+     #                    cv=2, verbose=1)
     
     
     return model
@@ -120,14 +126,17 @@ def save_model(model, model_filepath):
 
 def main():
     if len(sys.argv) == 3:
+    #if 3 == 3:
         database_filepath, model_filepath = sys.argv[1:]
+        #database_filepath='../data/DisasterResponse.db'
+        #model_filepath ='classifier.pkl'
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
         
         print('Building model...')
         model = build_model()
-        
+      
         print('Training model...')
         model.fit(X_train, Y_train)
         
