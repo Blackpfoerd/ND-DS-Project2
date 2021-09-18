@@ -34,7 +34,7 @@ def clean_data(df):
     # set each value to be the last character of the string
         categories[column] = categories[column].str[-1:]
         categories[column] = pd.to_numeric(categories[column],downcast='integer')
-    df=df.drop(columns=['categories','original','genre']).join(categories)
+    df=df.drop(columns=['categories']).join(categories)
     df.drop_duplicates(inplace=True)
     print(df.columns)
     return df

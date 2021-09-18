@@ -2,6 +2,7 @@ import sys
 import pandas as pd
 import re
 import pickle
+import numpy as np
 
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -32,7 +33,7 @@ def load_data(database_filepath):
     engine = create_engine('sqlite:///'+database_filepath)
     df= pd.read_sql_table('DisasterResponse', engine)
     X= df.message
-    y= df[df.columns.difference(['message'])]
+    y= df[df.columns.difference(['message','original','genre','id'])]
     
     category_names=y.columns
     return X,y,category_names
@@ -96,15 +97,15 @@ def evaluate_model(model, X_test, Y_test, category_names):
     Input:
         --  
     Output:
-        model: Pipeline = Returns ML Pipeline
+        --
     """
     
     Y_pred = model.predict(X_test)
-    class_rep = classification_report(Y_pred,Y_test.values, target_names=category_names)
+    #class_rep = classification_report(Y_test,Y_pred, target_names=np.array(category_names))
     accuracy= (Y_pred == Y_test).mean()
     
     print("Label:", category_names)
-    print("Confusion Matrix\n", class_rep)
+    #print("Confusion Matrix\n", class_rep)
     print("Accuracy:", accuracy)
 
 
