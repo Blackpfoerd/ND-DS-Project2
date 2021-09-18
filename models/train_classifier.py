@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix,classification_report
 from sklearn.feature_extraction.text import CountVectorizer,TfidfTransformer
 
 import nltk
@@ -49,7 +49,6 @@ def tokenize(text):
     text = re.sub(r'[^a-z0-9]'," ", text.lower())
     #tokenize and remove stop words
     tokens = word_tokenize(text)
-    #print('ok')
     #tokens_wo_stop= [word for word in tokens if word not in stopwords.words('english')]
     
     
@@ -75,17 +74,16 @@ def build_model():
     pipeline=Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(RandomForestClassifier(random_state=42),n_jobs=1))
+        #('clf', RandomForestClassifier())
+        ('clf', MultiOutputClassifier(RandomForestClassifier(),n_jobs=1))
     ])
-    
+    #If you want other parameters get them with pipeline.get_params().keys()
     parameters = {
-        'vect__ngram_range': ((1, 1), (1, 2)),
-        'tfidf__use_idf': [True, False],
-        'tfidf__norm': ['l1', 'l2']
+        'clf__estimator__max_depth': range(1,10,1)
     }
-    model=pipeline
-    #model = GridSearchCV(pipeline, param_grid=parameters,
-     #                    cv=2, verbose=1)
+    
+    model = GridSearchCV(pipeline, param_grid=parameters,
+                         cv=2, verbose=1)
     
     
     return model
@@ -102,11 +100,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
     """
     
     Y_pred = model.predict(X_test)
-    confusion_mat = confusion_matrix(Y_test,Y_pred, labels=category_names)
+    class_rep = classification_report(Y_pred,Y_test.values, target_names=category_names)
     accuracy= (Y_pred == Y_test).mean()
     
     print("Label:", category_names)
-    print("Confusion Matrix\n", confusion_mat)
+    print("Confusion Matrix\n", class_rep)
     print("Accuracy:", accuracy)
 
 
@@ -126,10 +124,9 @@ def save_model(model, model_filepath):
 
 def main():
     if len(sys.argv) == 3:
-    #if 3 == 3:
+
         database_filepath, model_filepath = sys.argv[1:]
-        #database_filepath='../data/DisasterResponse.db'
-        #model_filepath ='classifier.pkl'
+
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
