@@ -101,11 +101,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
     """
     
     Y_pred = model.predict(X_test)
-    #class_rep = classification_report(Y_test,Y_pred, target_names=np.array(category_names))
-    accuracy= (Y_pred == Y_test).mean()
     
+    accuracy= (Y_pred == Y_test).mean()
     print("Label:", category_names)
-    #print("Confusion Matrix\n", class_rep)
+    
+    for i in range(len(category_names)): 
+        print(category_names[i]) 
+        print(classification_report(Y_test[category_names[i]], Y_pred[:, i]))
+    
     print("Accuracy:", accuracy)
 
 
