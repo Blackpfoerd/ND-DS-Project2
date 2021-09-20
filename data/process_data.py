@@ -36,7 +36,9 @@ def clean_data(df):
         categories[column] = pd.to_numeric(categories[column],downcast='integer')
     df=df.drop(columns=['categories']).join(categories)
     df.drop_duplicates(inplace=True)
-    print(df.columns)
+    
+    df = df[~(df.related==2)] #Drop data related==2 
+    
     return df
 
 
