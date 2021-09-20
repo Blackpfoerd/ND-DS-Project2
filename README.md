@@ -1,13 +1,38 @@
 # Disaster Response Pipeline Project
 
-### Instructions:
+## Motivation:
+Every day countless messages are posted to social media platforms like Twitter, Instagram, Facebook & more. A small share of this messages include requests for help, food and shelter. In this project I want to help finding this messages with a data analytics solution.
 
+## Project Summary
+In this project I will set up a ML Service that will help to classify messages from social media platforms to identify people in need. Therefore I will train a Multiclass Classifier based on two datasets provided by Figure Eight.
+
+## Instructions:
 ### Required libraries
-nltk 
-numpy
-pandas
-scikit-learn
-sqlalchemy
+You will need to install following packages:
+- nltk 
+- numpy
+- pandas
+- scikit-learn
+- sqlalchemy
+
+### Structure
+
+- `app/`
+  - `template/`
+    - `master.html`  #Main page of web application.
+    - `go.html`  #Classification result page of web application.
+  - `run.py`  #Flask applications main file.
+
+- `data/`
+  - `disaster_categories.csv`  #Disaster categories dataset.
+  - `disaster_messages.csv`  #Disaster Messages dataset.
+  - `process_data.py` #ETL script
+  - `DisasterResponse.db` #Database including cleaned data
+
+- `models/`
+  - `train_classifier.py` #ML pipeline
+  - `train_classifier.pkl` #Pickled model
+
 
 
 #Files
